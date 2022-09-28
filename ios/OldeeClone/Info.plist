@@ -52,4 +52,10 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
+<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Your message to user when the photo library is accessed for the first time</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo Library permission is required to use in-app services, such as uploading an in-app profile or cheering board image.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera permission is required to use in-app services, such as uploading an in-app profile or cheering board image.</string>
 </plist>

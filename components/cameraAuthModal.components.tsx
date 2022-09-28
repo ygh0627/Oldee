@@ -1,9 +1,26 @@
 import styled from 'styled-components/native';
 import {wp} from '../utils/wp';
-import React from 'react';
+import React, {Dispatch, SetStateAction} from 'react';
 import cameraImage from '../assets/images/icon_camera_round.png';
 import galleryImage from '../assets/images/icon_gallery_round.png';
-function CameraAuthModal() {
+import {PERMISSIONS, RESULTS, request} from 'react-native-permissions';
+
+interface CameraAuthModalProps {
+  setModalVisible: Dispatch<SetStateAction<boolean>>;
+}
+
+const askPermission = async () => {
+  try {
+    const result = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
+    if (result === RESULTS.GRANTED) {
+      console.log('Good');
+    }
+  } catch (error) {
+    console.log('askPermission', error);
+  }
+};
+
+function CameraAuthModal({setModalVisible}: CameraAuthModalProps) {
   return (
     <Wrapper>
       <Header>접근 권한 안내</Header>
@@ -22,7 +39,11 @@ function CameraAuthModal() {
         <Description>
           정보통신망법령에 따라 꼭 필요한 항목만 필수 접근 합니다.
         </Description>
-        <ConfirmBtn>
+        <ConfirmBtn
+          onPress={() => {
+            setModalVisible(false);
+            askPermission();
+          }}>
           <ConfirmText>확인</ConfirmText>
         </ConfirmBtn>
       </AccessWrapper>
