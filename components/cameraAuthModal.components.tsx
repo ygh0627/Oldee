@@ -1,26 +1,24 @@
 import styled from 'styled-components/native';
 import {wp} from '../utils/wp';
-import React, {Dispatch, SetStateAction} from 'react';
+import React from 'react';
 import cameraImage from '../assets/images/icon_camera_round.png';
 import galleryImage from '../assets/images/icon_gallery_round.png';
-import {PERMISSIONS, RESULTS, request} from 'react-native-permissions';
+import {requestMultiple} from 'react-native-permissions';
+import {Permission} from '../hooks/usePermissionCheck.hooks';
 
 interface CameraAuthModalProps {
-  setModalVisible: Dispatch<SetStateAction<boolean>>;
+  makeModalInvisible: () => void;
+  platform: Permission['type'][];
 }
 
-const askPermission = async () => {
-  try {
-    const result = await request(PERMISSIONS.IOS.PHOTO_LIBRARY);
-    if (result === RESULTS.GRANTED) {
-      console.log('Good');
+function CameraAuthModal({makeModalInvisible, platform}: CameraAuthModalProps) {
+  const askPermission = async () => {
+    try {
+      await requestMultiple(platform);
+    } catch (e) {
+      console.log(e);
     }
-  } catch (error) {
-    console.log('askPermission', error);
-  }
-};
-
-function CameraAuthModal({setModalVisible}: CameraAuthModalProps) {
+  };
   return (
     <Wrapper>
       <Header>접근 권한 안내</Header>
@@ -41,8 +39,8 @@ function CameraAuthModal({setModalVisible}: CameraAuthModalProps) {
         </Description>
         <ConfirmBtn
           onPress={() => {
-            setModalVisible(false);
             askPermission();
+            makeModalInvisible();
           }}>
           <ConfirmText>확인</ConfirmText>
         </ConfirmBtn>
