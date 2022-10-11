@@ -6,13 +6,13 @@ import Modal from 'react-native-modal';
 import CameraAuthModal from '../components/cameraAuthModal.components';
 
 function FirstScreen() {
-  const [modalVisible, setModalVisible] = useState(false);
   const [allChecked, platform] = usePermissionCheck();
+  const [modalVisible, setModalVisible] = useState(false);
 
   const makeModalInvisible = () => {
     setModalVisible(false);
   };
-
+  // 권한 검사 하여 모달창 띄울지 말지
   useEffect(() => {
     if (allChecked) {
       setModalVisible(false);
@@ -20,12 +20,6 @@ function FirstScreen() {
       setModalVisible(true);
     }
   }, [allChecked]);
-
-  useEffect(() => {
-    setTimeout(() => {
-      SplashScreen.hide();
-    }, 1000);
-  }, []);
 
   return (
     <Safe>
