@@ -1,12 +1,17 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
 import styled from 'styled-components/native';
 import {wp} from '../utils/wp';
 
 const nicknameRegExp = /^[0-9a-zA-Z가-힣\x20]*$/gi;
 const patternRegExp = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
-function SignupTextInputs() {
+function SignupTextInputs({
+  email,
+  phone,
+}: Readonly<{
+  email: string | undefined;
+  phone: string | null | undefined;
+}>) {
   const [input, setInput] = useState({
     nicknameInput: '',
     numberInput: '',
@@ -41,6 +46,7 @@ function SignupTextInputs() {
         <Label>이메일</Label>
         <Input
           isPass={isEmailRegPass}
+          defaultValue={email}
           isEmpty={input.emailInput.length === 0}
           placeholder="이메일을 입력해주세요"
           value={input.emailInput}
@@ -57,6 +63,7 @@ function SignupTextInputs() {
       <InputWrapper isLast={true}>
         <Label>휴대폰</Label>
         <Input
+          defaultValue={phone?.toString()}
           isPass={isPhoneRegPass}
           isEmpty={input.numberInput.length === 0}
           placeholder="사용하실 핸드폰번호를 입력해주세요"
@@ -74,7 +81,7 @@ function SignupTextInputs() {
   );
 }
 const InputWrapper = styled.View<{isLast?: boolean}>`
-  margin-bottom: ${({isLast}) => (isLast ? `${wp(68)}px` : `${wp(43)}px`)};
+  margin-bottom: ${({isLast}) => (isLast ? `${wp(48)}px` : `${wp(43)}px`)};
 `;
 const Label = styled.Text`
   font-weight: 700;

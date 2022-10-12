@@ -1,10 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Alert, Image, Pressable, View} from 'react-native';
-import {
-  NaverLogin,
-  getProfile,
-  TokenResponse,
-} from '@react-native-seoul/naver-login';
+import {Image, Pressable, View} from 'react-native';
+import {NaverLogin, TokenResponse} from '@react-native-seoul/naver-login';
 import SplashScreen from 'react-native-splash-screen';
 import styled from 'styled-components/native';
 import splashImg from '../assets/images/splashImg.jpg';
@@ -12,6 +8,10 @@ import naverLogin from '../assets/images/naverLogin.jpg';
 import appleLogin from '../assets/images/appleLogin.jpg';
 import {wp} from '../utils/wp';
 import {useNavigation} from '@react-navigation/native';
+import {RootStackNavigationProp} from './rootStack.screens';
+import useSetLoginInfo from '../hooks/useSetLoginInfo.hooks';
+import useUserCheck from '../hooks/useUserCheck.hooks';
+
 interface naverKeyType {
   kConsumerKey: string;
   kConsumerSecret: string;
@@ -26,12 +26,13 @@ const naverAndroidKey = {
 function LoginScreen() {
   SplashScreen.hide();
   const [naverToken, setNaverToken] = useState<TokenResponse | null>();
-  const navigation = useNavigation();
-  console.log(naverToken);
+  const navigation = useNavigation<RootStackNavigationProp>();
+  const {loginInfo, phoneNumber} = useSetLoginInfo(naverToken);
+  const checkResult = useUserCheck(loginInfo);
+
   const naverLoginFn = (props: naverKeyType) => {
     return new Promise((resolve, reject) => {
       NaverLogin.login(props, (err, token) => {
-        console.log(`\n\n  Token is fetched  :: ${token} \n\n`);
         setNaverToken(token);
         if (err) {
           reject(err);
@@ -42,11 +43,24 @@ function LoginScreen() {
     });
   };
 
+  const onPress = () => {
+    naverLoginFn(naverAndroidKey);
+  };
+
+  useEffect(() => {
+    if (checkResult?.data.errorMessage === 'No Match User') {
+      console.log('디비에 없는 회원입니다');
+      navigation.navigate('회원가입', {
+        phone: phoneNumber,
+        email: loginInfo?.email,
+      });
+    }
+  }, [checkResult, navigation]);
   return (
     <View style={{flex: 1}}>
       <Background source={splashImg} resizeMode="cover" />
       <LoginBoxWrapper>
-        <Pressable onPress={() => naverLoginFn(naverAndroidKey)}>
+        <Pressable onPress={onPress}>
           <Image source={naverLogin} style={{marginBottom: wp(12)}} />
         </Pressable>
         <Pressable>
