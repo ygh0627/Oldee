@@ -1,44 +1,36 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from 'styled-components/native';
+import {inputProps} from '../screens/signUpScreen.screens';
 import {wp} from '../utils/wp';
 
 const nicknameRegExp = /^[0-9a-zA-Z가-힣\x20]*$/gi;
 const patternRegExp = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/g;
 
-function SignupTextInputs({
-  email,
-  phone,
-}: Readonly<{
-  email: string | undefined;
-  phone: string | null | undefined;
-}>) {
-  const [input, setInput] = useState({
-    nicknameInput: '',
-    numberInput: '',
-    emailInput: '',
-  });
+interface SignupTextInputProps {
+  input: inputProps;
+  onChangeText: (text: string) => (target: string) => void;
+}
+
+function SignupTextInputs({input, onChangeText}: SignupTextInputProps) {
   const isNicknameRegPass =
-    input.nicknameInput.match(nicknameRegExp) !== null &&
-    input.nicknameInput.length > 3;
-  const isEmailRegPass = input.emailInput.match(patternRegExp) !== null;
-  const isPhoneRegPass = input.numberInput.length > 9;
+    input.userName.match(nicknameRegExp) !== null && input.userName.length > 2;
+  const isEmailRegPass = input.userEmail.match(patternRegExp) !== null;
+  const isPhoneRegPass = input.userPhone.length > 9;
   return (
     <>
-      <InputWrapper>
+      <InputWrapper isFirst={true}>
         <Label>닉네임</Label>
         <Input
           isPass={isNicknameRegPass}
-          isEmpty={input.nicknameInput.length === 0}
+          isEmpty={input.userName.length === 0}
           placeholder="닉네임을 입력해주세요 (최대 10자)"
-          value={input.nicknameInput}
+          value={input.userName}
           maxLength={10}
-          onChangeText={text =>
-            setInput(prev => {
-              return {...prev, nicknameInput: text};
-            })
-          }
+          onChangeText={text => {
+            onChangeText(text)('userName');
+          }}
         />
-        {!isNicknameRegPass && input.nicknameInput.length > 0 && (
+        {!isNicknameRegPass && input.userName.length > 0 && (
           <WarnMessage>특수문자를 제외한 3~20자를 입력해주세요</WarnMessage>
         )}
       </InputWrapper>
@@ -46,42 +38,33 @@ function SignupTextInputs({
         <Label>이메일</Label>
         <Input
           isPass={isEmailRegPass}
-          defaultValue={email}
-          isEmpty={input.emailInput.length === 0}
+          isEmpty={input.userEmail.length === 0}
           placeholder="이메일을 입력해주세요"
-          value={input.emailInput}
-          onChangeText={text =>
-            setInput(prev => {
-              return {...prev, emailInput: text};
-            })
-          }
+          value={input.userEmail}
+          onChangeText={text => onChangeText(text)('userEmail')}
         />
-        {!isEmailRegPass && input.emailInput.length > 0 && (
+        {!isEmailRegPass && input.userEmail.length > 0 && (
           <WarnMessage>올바른 이메일 형식을 입력해주세요.</WarnMessage>
         )}
       </InputWrapper>
       <InputWrapper isLast={true}>
         <Label>휴대폰</Label>
         <Input
-          defaultValue={phone?.toString()}
           isPass={isPhoneRegPass}
-          isEmpty={input.numberInput.length === 0}
+          isEmpty={input.userPhone.length === 0}
           placeholder="사용하실 핸드폰번호를 입력해주세요"
           keyboardType="numeric"
-          value={input.numberInput}
+          value={input.userPhone}
           maxLength={11}
-          onChangeText={text =>
-            setInput(prev => {
-              return {...prev, numberInput: text};
-            })
-          }
+          onChangeText={text => onChangeText(text)('userPhone')}
         />
       </InputWrapper>
     </>
   );
 }
-const InputWrapper = styled.View<{isLast?: boolean}>`
-  margin-bottom: ${({isLast}) => (isLast ? `${wp(48)}px` : `${wp(43)}px`)};
+const InputWrapper = styled.View<{isLast?: boolean; isFirst?: boolean}>`
+  margin-bottom: ${({isLast}) => (isLast ? `${wp(32)}px` : `${wp(23)}px`)};
+  margin-top: ${({isFirst}) => (isFirst ? `${wp(20)}px` : '0px')};
 `;
 const Label = styled.Text`
   font-weight: 700;

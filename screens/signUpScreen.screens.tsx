@@ -1,5 +1,5 @@
 import {RouteProp, useRoute} from '@react-navigation/native';
-import React from 'react';
+import React, {useState} from 'react';
 import {Keyboard, TouchableWithoutFeedback} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import styled from 'styled-components/native';
@@ -10,13 +10,63 @@ import {RootStackParamList} from './rootStack.screens';
 
 type SignupScreenRouteProp = RouteProp<RootStackParamList, '회원가입'>;
 
+export interface inputProps {
+  userSnsId: string;
+  userPhone: string;
+  userEmail: string;
+  userName: string;
+  userOSType: string;
+  userAlertYn: number;
+  userPolicyYn: number;
+  userMarketingYn: number;
+  userSnsType: string;
+  [key: string]: string | Number;
+}
 function SignUpScreen() {
   const {params} = useRoute<SignupScreenRouteProp>();
+  const [input, setInput] = useState<inputProps>({
+    userSnsId: params.userSnsId ?? '',
+    userPhone: params.phone ?? '',
+    userEmail: params.email ?? '',
+    userName: '',
+    userOSType: 'android',
+    userAlertYn: 0,
+    userPolicyYn: 0,
+    userMarketingYn: 1,
+    userSnsType: params.userSnsType ?? '',
+  });
+  console.log(input);
+  const onChangeText = (text: string) => {
+    return (target: string) => {
+      setInput(prev => {
+        return {...prev, [target]: text};
+      });
+    };
+  };
+
+  const onValueChange = (newValue: boolean) => {
+    return (target: string) => {
+      setInput(prev => {
+        return {...prev, [target]: Number(newValue)};
+      });
+    };
+  };
+
+  const onPress = (target: string) => {
+    setInput(prev => {
+      return {...prev, [target]: Number(!prev[target])};
+    });
+  };
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <SafeAreaView style={{flex: 1, paddingHorizontal: wp(24)}}>
-        <SignupTextInputs email={params.email} phone={params.phone} />
-        <SignupCheckbox />
+        <SignupTextInputs input={input} onChangeText={onChangeText} />
+        <SignupCheckbox
+          input={input}
+          onValueChange={onValueChange}
+          onPress={onPress}
+        />
         <SignupSubmitBtn>
           <SignupText>Oldee 시작하기</SignupText>
         </SignupSubmitBtn>
@@ -29,7 +79,7 @@ const SignupSubmitBtn = styled.Pressable`
   padding: ${wp(14)}px ${wp(115)}px;
   background: #90b7de;
   border-radius: 8px;
-  margin-top: ${wp(34)}px;
+  margin-bottom: ${wp(10)}px;
 `;
 const SignupText = styled.Text`
   font-weight: 700;

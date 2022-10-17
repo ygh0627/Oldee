@@ -3,14 +3,14 @@ import {Image, Pressable, View} from 'react-native';
 import {NaverLogin, TokenResponse} from '@react-native-seoul/naver-login';
 import SplashScreen from 'react-native-splash-screen';
 import styled from 'styled-components/native';
-import splashImg from '../assets/images/splashImg.jpg';
-import naverLogin from '../assets/images/naverLogin.jpg';
-import appleLogin from '../assets/images/appleLogin.jpg';
 import {wp} from '../utils/wp';
 import {useNavigation} from '@react-navigation/native';
 import {RootStackNavigationProp} from './rootStack.screens';
 import useSetLoginInfo from '../hooks/useSetLoginInfo.hooks';
 import useUserCheck from '../hooks/useUserCheck.hooks';
+const splashImg = require('../assets/images/splashImg.jpg');
+const naverLogin = require('../assets/images/naverLogin.jpg');
+const appleLogin = require('../assets/images/appleLogin.jpg');
 
 interface naverKeyType {
   kConsumerKey: string;
@@ -29,7 +29,6 @@ function LoginScreen() {
   const navigation = useNavigation<RootStackNavigationProp>();
   const {loginInfo, phoneNumber} = useSetLoginInfo(naverToken);
   const checkResult = useUserCheck(loginInfo);
-
   const naverLoginFn = (props: naverKeyType) => {
     return new Promise((resolve, reject) => {
       NaverLogin.login(props, (err, token) => {
@@ -49,13 +48,15 @@ function LoginScreen() {
 
   useEffect(() => {
     if (checkResult?.data.errorMessage === 'No Match User') {
-      console.log('디비에 없는 회원입니다');
       navigation.navigate('회원가입', {
         phone: phoneNumber,
         email: loginInfo?.email,
+        userSnsId: loginInfo?.userSnsId,
+        userSnsType: loginInfo?.userSnsType,
       });
     }
-  }, [checkResult, navigation]);
+  }, [checkResult, navigation, loginInfo, phoneNumber]);
+
   return (
     <View style={{flex: 1}}>
       <Background source={splashImg} resizeMode="cover" />

@@ -13,13 +13,15 @@ export interface loginInfoType {
   email?: string;
   userSnsId?: string;
   expireAt?: string;
+  userSnsType?: string;
 }
 
 function useSetLoginInfo(token?: TokenResponse | null) {
   const [userInfo, setUserInfo] = useState<GetProfileResponse>();
   const [loginInfo, setLoginInfo] = useState<loginInfoType>();
+
   const phoneNumber = useMemo(() => {
-    return userInfo?.response.mobile;
+    return userInfo?.response.mobile?.split('-').join('');
   }, [userInfo]);
 
   useEffect(() => {
@@ -32,6 +34,7 @@ function useSetLoginInfo(token?: TokenResponse | null) {
         }
         setUserInfo(profileResult);
       };
+
       getUserProfile();
 
       setLoginInfo(prev => {
@@ -52,6 +55,7 @@ function useSetLoginInfo(token?: TokenResponse | null) {
           ...prev,
           userSnsId: userInfo.response.id,
           email: userInfo.response.email,
+          userSnsType: 'naver',
         };
       });
     }
