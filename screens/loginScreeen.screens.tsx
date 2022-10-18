@@ -45,7 +45,8 @@ function LoginScreen() {
   const onPress = () => {
     naverLoginFn(naverAndroidKey);
   };
-
+  console.log('네이버토큰', naverToken);
+  console.log('체크결과', checkResult);
   useEffect(() => {
     if (checkResult?.data.errorMessage === 'No Match User') {
       navigation.navigate('회원가입', {
