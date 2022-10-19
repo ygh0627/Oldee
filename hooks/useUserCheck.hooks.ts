@@ -5,7 +5,7 @@ import api from '../utils/api.utils';
 
 function useUserCheck(loginInfo: loginInfoType | undefined) {
   const [checkResult, setCheckResult] = useState<AxiosResponse>();
-  console.log('유저정보', loginInfo);
+
   useEffect(() => {
     const checkUser = async () => {
       try {

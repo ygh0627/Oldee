@@ -8,6 +8,7 @@ import {useNavigation} from '@react-navigation/native';
 import {RootStackNavigationProp} from './rootStack.screens';
 import useSetLoginInfo from '../hooks/useSetLoginInfo.hooks';
 import useUserCheck from '../hooks/useUserCheck.hooks';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const splashImg = require('../assets/images/splashImg.jpg');
 const naverLogin = require('../assets/images/naverLogin.jpg');
 const appleLogin = require('../assets/images/appleLogin.jpg');
@@ -45,9 +46,16 @@ function LoginScreen() {
   const onPress = () => {
     naverLoginFn(naverAndroidKey);
   };
-  console.log('네이버토큰', naverToken);
-  console.log('체크결과', checkResult);
+
   useEffect(() => {
+    const storeToken = async (token: string, refreshToken: string) => {
+      try {
+        await AsyncStorage.setItem('token', token);
+        await AsyncStorage.setItem('refreshToken', refreshToken);
+      } catch (e) {
+        console.log(e);
+      }
+    };
     if (checkResult?.data.errorMessage === 'No Match User') {
       navigation.navigate('회원가입', {
         phone: phoneNumber,
@@ -55,9 +63,17 @@ function LoginScreen() {
         userSnsId: loginInfo?.userSnsId,
         userSnsType: loginInfo?.userSnsType,
       });
+    } else if (checkResult?.data.message === 'success') {
+      if (
+        typeof loginInfo?.accessToken !== 'undefined' &&
+        typeof loginInfo?.refreshToken !== 'undefined'
+      ) {
+        storeToken(loginInfo?.accessToken, loginInfo?.refreshToken);
+      }
+
+      navigation.navigate('Home');
     }
   }, [checkResult, navigation, loginInfo, phoneNumber]);
-
   return (
     <View style={{flex: 1}}>
       <Background source={splashImg} resizeMode="cover" />
